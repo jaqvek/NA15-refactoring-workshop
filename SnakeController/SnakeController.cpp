@@ -6,6 +6,9 @@
 #include "EventT.hpp"
 #include "IPort.hpp"
 
+// Nie mam pomysłu jak przerobić te bloki try..catch ale chce sprawdzić czy działa pull-request
+// czy można prosić o podpowiedź od czego warto zacząć?
+
 namespace Snake
 {
 ConfigurationError::ConfigurationError()
@@ -28,39 +31,39 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
     int foodX, foodY;
     istr >> w >> width >> height >> f >> foodX >> foodY >> s;
 
-    if (w == 'W' and f == 'F' and s == 'S') {
-        m_mapDimension = std::make_pair(width, height);
-        m_foodPosition = std::make_pair(foodX, foodY);
-
-        istr >> d;
-        switch (d) {
-            case 'U':
-                m_currentDirection = Direction_UP;
-                break;
-            case 'D':
-                m_currentDirection = Direction_DOWN;
-                break;
-            case 'L':
-                m_currentDirection = Direction_LEFT;
-                break;
-            case 'R':
-                m_currentDirection = Direction_RIGHT;
-                break;
-            default:
-                throw ConfigurationError();
-        }
-        istr >> length;
-
-        while (length) {
-            Segment seg;
-            istr >> seg.x >> seg.y;
-            seg.ttl = length--;
-
-            m_segments.push_back(seg);
-        }
-    } else {
+    if (!(w == 'W' and f == 'F' and s == 'S'))
+    {
         throw ConfigurationError();
     }
+
+     m_mapDimension = std::make_pair(width, height);
+     m_foodPosition = std::make_pair(foodX, foodY);
+
+     istr >> d;
+     switch (d) {
+         case 'U':
+             m_currentDirection = Direction_UP;
+             break;
+         case 'D':
+             m_currentDirection = Direction_DOWN;
+             break;
+         case 'L':
+             m_currentDirection = Direction_LEFT;
+             break;
+         case 'R':
+             m_currentDirection = Direction_RIGHT;
+             break;
+         default:
+             throw ConfigurationError();
+     }
+
+     istr >> length;
+     while (length) {
+         Segment seg;
+         istr >> seg.x >> seg.y;
+         seg.ttl = length--;
+          m_segments.push_back(seg);
+     }
 }
 
 void Controller::receive(std::unique_ptr<Event> e)
